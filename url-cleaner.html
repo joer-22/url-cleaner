@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URL Cleaner — Stay22</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --surface2: #222;
+    --border: #2e2e2e;
+    --border-hover: #444;
+    --text: #f0f0f0;
+    --text-muted: #777;
+    --accent: #c8f060;
+    --radius: 8px;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 660px;
+  }
+
+  header {
+    margin-bottom: 2rem;
+  }
+
+  .logo {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .field-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.8;
+    padding: 12px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+    min-height: 160px;
+  }
+  textarea:focus { border-color: var(--border-hover); }
+  textarea[readonly] {
+    background: #111;
+    color: #999;
+    cursor: default;
+  }
+
+  .arrow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+
+  .arrow-line { flex: 1; height: 1px; background: var(--border); }
+
+  .arrow-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .arrow-btn:hover { opacity: 0.88; }
+  .arrow-btn:active { transform: scale(0.97); }
+
+  .option-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+    width: fit-content;
+  }
+  .option-row input[type=checkbox] {
+    accent-color: var(--accent);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border-hover);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .status {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 10px;
+    min-height: 16px;
+  }
+  .status.ok { color: var(--accent); }
+
+  .clear-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 1rem;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    display: block;
+  }
+  .clear-btn:hover { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="logo">Stay22 · Internal Tools</p>
+    <h1>URL Cleaner</h1>
+  </header>
+
+  <div class="card">
+
+    <label class="field-label" for="input">Input — paste URLs, one per line</label>
+    <textarea id="input" placeholder="https://veganhaventravel.com/santorini-vegan-hotel/&#10;https://veganhaventravel.com/mod-santorini/&#10;https://veganhaventravel.com/goji-vegan-hotel-rhodes/"></textarea>
+
+    <div class="arrow-row">
+      <span class="arrow-line"></span>
+      <button class="arrow-btn" onclick="process()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1v12M1 7l6 6 6-6" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Clean URLs
+      </button>
+      <span class="arrow-line"></span>
+    </div>
+
+    <div class="output-header">
+      <label class="field-label" for="output" style="margin-bottom:0;">Output</label>
+      <button class="copy-btn" onclick="copyOutput()" id="copyBtn">Copy</button>
+    </div>
+
+    <label class="option-row" style="margin-bottom:10px;">
+      <input type="checkbox" id="trailingComma">
+      Include trailing comma on last URL
+    </label>
+
+    <textarea id="output" readonly placeholder="Cleaned URLs will appear here..."></textarea>
+
+    <p class="status" id="status"></p>
+
+    <button class="clear-btn" onclick="clearAll()">Clear all</button>
+
+  </div>
+
+</div>
+
+<script>
+  function process() {
+    const raw = document.getElementById('input').value;
+    const trailingComma = document.getElementById('trailingComma').checked;
+
+    const lines = raw.split('\n')
+      .map(l => l.trim())
+      .filter(l => l.length > 0)
+      .map(l => {
+        l = l.replace(/^https?:\/\//i, '');
+        l = l.replace(/^www\./i, '');
+        l = l.replace(/\/$/, '');
+        return l;
+      });
+
+    if (lines.length === 0) {
+      document.getElementById('status').textContent = 'No URLs found.';
+      document.getElementById('status').className = 'status';
+      return;
+    }
+
+    const result = lines.map((url, i) => {
+      const isLast = i === lines.length - 1;
+      return (!isLast || trailingComma) ? url + ',' : url;
+    }).join('\n');
+
+    document.getElementById('output').value = result;
+    document.getElementById('status').textContent = `${lines.length} URL${lines.length !== 1 ? 's' : ''} cleaned.`;
+    document.getElementById('status').className = 'status ok';
+  }
+
+  function copyOutput() {
+    const out = document.getElementById('output').value;
+    if (!out) return;
+    navigator.clipboard.writeText(out).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1800);
+    });
+  }
+
+  function clearAll() {
+    document.getElementById('input').value = '';
+    document.getElementById('output').value = '';
+    document.getElementById('status').textContent = '';
+    document.getElementById('status').className = 'status';
+  }
+
+  document.getElementById('input').addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') process();
+  });
+</script>
+</body>
+</html>
